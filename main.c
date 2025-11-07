@@ -107,23 +107,38 @@ int main() {
         fprintf(stderr, "Unable to create a binary tree");
     }
     
-    // depth 1
-    BinaryTreeInsertLeftOn(root, 1);
-    BinaryTreeInsertRightOn(root, 2);
+    /*
+        Creates the following tree
 
-    // depth 2
-    BinaryTreeInsertLeftOn(root->left, 3);
-    BinaryTreeInsertRightOn(root->left, 4);
+              0
+             / \
+            1   2
+           / \
+          3   4
+         / \   \
+        5   6   7
+             \
+              8
+    */
+    {
+        // depth 1
+        BinaryTreeInsertLeftOn(root, 1);
+        BinaryTreeInsertRightOn(root, 2);
 
-    // depth 3    
-    BinaryTreeInsertLeftOn(root->left->left, 5);
-    BinaryTreeInsertRightOn(root->left->left, 6);
+        // depth 2
+        BinaryTreeInsertLeftOn(root->left, 3);
+        BinaryTreeInsertRightOn(root->left, 4);
 
-    BinaryTreeInsertRightOn(root->left->right, 7);
+        // depth 3    
+        BinaryTreeInsertLeftOn(root->left->left, 5);
+        BinaryTreeInsertRightOn(root->left->left, 6);
 
-    // depth 4
-    BinaryTreeInsertRightOn(root->left->left->right, 8);
-    
+        BinaryTreeInsertRightOn(root->left->right, 7);
+
+        // depth 4
+        BinaryTreeInsertRightOn(root->left->left->right, 8);
+    }
+
     printf("bt->left->data = %d\n", root->left->data);
 
     root->left->data = 3;
