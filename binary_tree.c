@@ -9,16 +9,7 @@ typedef struct BinaryTree {
 } binary_tree_t;
 
 binary_tree_t* BinaryTreeCreate() {
-    binary_tree_t* bt = (binary_tree_t*) malloc(sizeof(binary_tree_t));
-    if (bt == NULL) {
-        return (binary_tree_t*) NULL;
-    }
-
-    bt->data = 0;
-    bt->left = NULL;
-    bt->right = NULL;
-
-    return bt;
+    return (binary_tree_t*) calloc(1, sizeof(binary_tree_t));
 }
 
 int BinaryTreeInsertLeftOn(binary_tree_t* bt, int value) {
@@ -26,10 +17,8 @@ int BinaryTreeInsertLeftOn(binary_tree_t* bt, int value) {
         return 0;
     }
 
-    if (bt->left == NULL) {
-        bt->left = (binary_tree_t*) malloc(sizeof(binary_tree_t));    
-        bt->left->data = value;
-    }
+    bt->left = BinaryTreeCreate();
+    bt->left->data = value;
 
     return 1;
 }
@@ -39,63 +28,42 @@ int BinaryTreeInsertRightOn(binary_tree_t* bt, int value) {
         return 0;
     }
 
-    if (bt->right == NULL) {
-        bt->right = (binary_tree_t*) malloc(sizeof(binary_tree_t));    
-        bt->right->data = value;
-    }
+    bt->right = BinaryTreeCreate();    
+    bt->right->data = value;
 
     return 1;
 }
 
 void BinaryTreeDestroy(binary_tree_t* bt) {
     static int depth = 0;
-    static bool onLeftBranch = false;
+    static int onLeftBranch = 0;
 
-    printf("========================== BinaryTreeDestroy called ==========================\n");
+    if (bt == NULL) {
+        return;
+    }
+
     printf("[[ DEPTH = %d on %s branch ]]\n", depth, (onLeftBranch ? "left" : "right"));
     printf("DATA = %d\n", bt->data);
-    printf("BEFORE WHILE: bt->left = 0x%X\n", bt->left);
-    printf("BEFORE WHILE: bt->right = 0x%X\n", bt->right);
 
-    if (bt->left == NULL && bt->right == NULL) {
-        printf("WHILE WILL NOT BE VISITED (left and right are NULL)\n");
-        printf("\n");
+    if (bt->left != NULL) {
+        printf("Freeing 0x%p->left\n\n", bt);
+        ++depth;
+        onLeftBranch = 1;
+        BinaryTreeDestroy(bt->left);
+        bt->left = NULL;
     }
 
-    while (bt->left != NULL || bt->right != NULL) {
-        printf("WHILE VISITED\n");
-        if (bt->left != NULL) {
-            printf("Freeing 0x%X->left\n\n", bt);
-            ++depth;
-            onLeftBranch = true;
-            BinaryTreeDestroy(bt->left);
-            bt->left = NULL;
-        }
-
-        else {
-            printf("0x%X->left is NULL\n", bt);
-        }
-
-        if (bt->right != NULL) {
-            printf("Freeing 0x%X->right\n\n", bt);
-            ++depth;
-            onLeftBranch = false;
-            BinaryTreeDestroy(bt->right);
-            bt->right = NULL;
-        }
-
-        else {    
-            printf("0x%X->right is NULL\n", bt);
-        }
-
-        printf("\n");
+    if (bt->right != NULL) {
+        printf("Freeing 0x%p->right\n\n", bt);
+        ++depth;
+        onLeftBranch = 0;
+        BinaryTreeDestroy(bt->right);
+        bt->right = NULL;
     }
 
-    printf("[[ DEPTH = %d on %s branch ]]\n", depth, (onLeftBranch ? "left" : "right"));
-    printf("Freeing 0x%X\n", bt);
+
+    printf("Freeing 0x%p\n", bt);
     free(bt);
-    bt = NULL;
-
 
     --depth;
 }
@@ -134,19 +102,11 @@ int main() {
         // depth 3    
         BinaryTreeInsertLeftOn(root->left->left, 5);
         BinaryTreeInsertRightOn(root->left->left, 6);
-
         BinaryTreeInsertRightOn(root->left->right, 7);
 
         // depth 4
         BinaryTreeInsertRightOn(root->left->left->right, 8);
     }
-
-    printf("bt->left->data = %d\n", root->left->data);
-
-    root->left->data = 3;
-    printf("bt->left->data = %d\n", root->left->data);
-    
-    printf("\n");
 
     BinaryTreeDestroy(root);
 

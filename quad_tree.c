@@ -4,6 +4,11 @@
 
 #define QUADTREE_MAX_BRANCHES 4
 
+#define TOP_LEFT_PART     0
+#define BOTTOM_LEFT_PART  1
+#define BOTTOM_RIGHT_PART 2
+#define TOP_RIGHT_PART    3
+
 typedef struct QuadTree quad_tree_t;
 typedef struct QuadTree {
     int data;
@@ -11,17 +16,7 @@ typedef struct QuadTree {
 } quad_tree_t;
 
 quad_tree_t* QuadTreeCreate() {
-    quad_tree_t* qt = (quad_tree_t*) malloc(sizeof(quad_tree_t));
-    if (qt == NULL) {
-        return (quad_tree_t*) NULL;
-    }
-
-    qt->data = 0;
-    for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
-        qt->branches[i] = NULL;
-    }
-
-    return qt;
+    return (quad_tree_t*) calloc(1, sizeof(quad_tree_t));
 }
 
 int QuadTreeInsertOn(quad_tree_t* qt, int index, int value) {
@@ -32,7 +27,7 @@ int QuadTreeInsertOn(quad_tree_t* qt, int index, int value) {
     }
 
     if (qt->branches[index] == NULL) {
-        qt->branches[index] = (quad_tree_t*) malloc(sizeof(quad_tree_t));    
+        qt->branches[index] = QuadTreeCreate();    
         qt->branches[index]->data = value;
     }
 
@@ -43,52 +38,23 @@ void QuadTreeDestroy(quad_tree_t* qt) {
     static int depth = 0;
     static int branchIndex = 0;
 
-    printf("========================== QuadTreeDestroy called ==========================\n");
     printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);
     printf("DATA = %d\n", qt->data);
 
     for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
-        printf("BEFORE WHILE: qt->branches[%d] = 0x%X\n", i, qt->branches[i]);
-    }
+        if (qt->branches[i] != NULL) {
+            printf("Freeing 0x%X->branches[%d]\n\n", qt, i);
+            ++depth;
+            branchIndex = i;
+            QuadTreeDestroy(qt->branches[i]);
+            qt->branches[i] = NULL;
+        }
 
-    if (qt->branches[0] != NULL ||
-        qt->branches[1] != NULL ||
-        qt->branches[2] != NULL ||
-        qt->branches[3] != NULL
-    ) {
-        printf("WHILE WILL NOT BE VISITED (all %d branches are NULL)\n", QUADTREE_MAX_BRANCHES);
         printf("\n");
     }
 
-    while (qt->branches[0] != NULL ||
-           qt->branches[1] != NULL ||
-           qt->branches[2] != NULL ||
-           qt->branches[3] != NULL
-    ) {
-        printf("WHILE VISITED\n");
-
-        for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
-            if (qt->branches[i] != NULL) {
-                printf("Freeing 0x%X->branches[%d]\n\n", qt, i);
-                ++depth;
-                branchIndex = i;
-                QuadTreeDestroy(qt->branches[i]);
-                qt->branches[i] = NULL;
-            }
-
-            else {
-                printf("0x%X->branches[%d] is NULL\n", qt, i);
-            }
-
-            printf("\n");
-        }
-    }
-
-    printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);
     printf("Freeing 0x%X\n", qt);
     free(qt);
-    qt = NULL;
-
 
     --depth;
 }
