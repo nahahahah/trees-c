@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define QUADTREE_MAX_BRANCHES 4
+
 typedef struct QuadTree quad_tree_t;
 typedef struct QuadTree {
     int data;
-    quad_tree_t* branches[4];
+    quad_tree_t* branches[QUADTREE_MAX_BRANCHES];
 } quad_tree_t;
 
 quad_tree_t* QuadTreeCreate() {
@@ -15,7 +17,7 @@ quad_tree_t* QuadTreeCreate() {
     }
 
     qt->data = 0;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
         qt->branches[i] = NULL;
     }
 
@@ -23,7 +25,7 @@ quad_tree_t* QuadTreeCreate() {
 }
 
 int QuadTreeInsertOn(quad_tree_t* qt, int index, int value) {
-    assert(index >= 0 && index < 4 && "Index must be within [0;3]");
+    assert(index >= 0 && index < QUADTREE_MAX_BRANCHES && "Index must be within [0;3]");
 
     if (qt == NULL) {
         return 0;
@@ -44,17 +46,17 @@ void QuadTreeDestroy(quad_tree_t* qt) {
     printf("========================== QuadTreeDestroy called ==========================\n");
     printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);
     printf("DATA = %d\n", qt->data);
-    printf("BEFORE WHILE: qt->branches[0] = 0x%X\n", qt->branches[0]);
-    printf("BEFORE WHILE: qt->branches[1] = 0x%X\n", qt->branches[1]);
-    printf("BEFORE WHILE: qt->branches[2] = 0x%X\n", qt->branches[2]);
-    printf("BEFORE WHILE: qt->branches[3] = 0x%X\n", qt->branches[3]);
+
+    for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
+        printf("BEFORE WHILE: qt->branches[%d] = 0x%X\n", i, qt->branches[i]);
+    }
 
     if (qt->branches[0] != NULL ||
         qt->branches[1] != NULL ||
         qt->branches[2] != NULL ||
         qt->branches[3] != NULL
     ) {
-        printf("WHILE WILL NOT BE VISITED (all 4 branches are NULL)\n");
+        printf("WHILE WILL NOT BE VISITED (all %d branches are NULL)\n", QUADTREE_MAX_BRANCHES);
         printf("\n");
     }
 
@@ -65,7 +67,7 @@ void QuadTreeDestroy(quad_tree_t* qt) {
     ) {
         printf("WHILE VISITED\n");
 
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < QUADTREE_MAX_BRANCHES; ++i) {
             if (qt->branches[i] != NULL) {
                 printf("Freeing 0x%X->branches[%d]\n\n", qt, i);
                 ++depth;
@@ -95,7 +97,7 @@ int main() {
     quad_tree_t* root = QuadTreeCreate();
 
     if (root == NULL) {
-        fprintf(stderr, "Unable to create a binary tree");
+        fprintf(stderr, "Unable to create a quad tree");
     }
     
     /*

@@ -60,7 +60,7 @@ void OcTreeDestroy(octree_t* ot) {
         ot->branches[6] != NULL ||
         ot->branches[7] != NULL
     ) {
-        printf("WHILE WILL NOT BE VISITED (all 8 branches are NULL)\n");
+        printf("WHILE WILL NOT BE VISITED (all %d branches are NULL)\n", OCTREE_MAX_BRANCHES);
         printf("\n");
     }
 
