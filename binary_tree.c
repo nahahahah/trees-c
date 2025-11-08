@@ -34,13 +34,15 @@ int BinaryTreeInsertRightOn(binary_tree_t* bt, int value) {
     return 1;
 }
 
-void BinaryTreeDestroy(binary_tree_t* bt) {
+void BinaryTreeDestroy(binary_tree_t** pBt) {
     static int depth = 0;
     static int onLeftBranch = 0;
 
-    if (bt == NULL) {
+    if (pBt == NULL) {
         return;
     }
+
+    binary_tree_t* bt = *pBt;
 
     printf("[[ DEPTH = %d on %s branch ]]\n", depth, (onLeftBranch ? "left" : "right"));
     printf("DATA = %d\n", bt->data);
@@ -49,7 +51,7 @@ void BinaryTreeDestroy(binary_tree_t* bt) {
         printf("Freeing 0x%p->left\n\n", bt);
         ++depth;
         onLeftBranch = 1;
-        BinaryTreeDestroy(bt->left);
+        BinaryTreeDestroy(&(bt->left));
         bt->left = NULL;
     }
 
@@ -57,13 +59,14 @@ void BinaryTreeDestroy(binary_tree_t* bt) {
         printf("Freeing 0x%p->right\n\n", bt);
         ++depth;
         onLeftBranch = 0;
-        BinaryTreeDestroy(bt->right);
+        BinaryTreeDestroy(&(bt->right));
         bt->right = NULL;
     }
 
 
     printf("Freeing 0x%p\n", bt);
-    free(bt);
+    free(*pBt);
+    *pBt = NULL;
 
     --depth;
 }
@@ -108,7 +111,7 @@ int main() {
         BinaryTreeInsertRightOn(root->left->left->right, 8);
     }
 
-    BinaryTreeDestroy(root);
+    BinaryTreeDestroy(&root);
 
     return EXIT_SUCCESS;
 }

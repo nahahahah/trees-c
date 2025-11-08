@@ -42,6 +42,10 @@ void OcTreeDestroy(octree_t** pOt) {
     static int depth = 0;
     static int branchIndex = 0;
 
+    if (pOt == NULL) {
+        return;
+    }
+
     octree_t* ot = *pOt;
 
     printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);

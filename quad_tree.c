@@ -34,9 +34,16 @@ int QuadTreeInsertOn(quad_tree_t* qt, int index, int value) {
     return 1;
 }
 
-void QuadTreeDestroy(quad_tree_t* qt) {
+void QuadTreeDestroy(quad_tree_t** pQt) {
     static int depth = 0;
     static int branchIndex = 0;
+
+    if (pQt == NULL) {
+        printf("pQt is NULL. Aborting.");
+        return;
+    }
+
+    quad_tree_t* qt = *pQt;
 
     printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);
     printf("DATA = %d\n", qt->data);
@@ -46,7 +53,7 @@ void QuadTreeDestroy(quad_tree_t* qt) {
             printf("Freeing 0x%X->branches[%d]\n\n", qt, i);
             ++depth;
             branchIndex = i;
-            QuadTreeDestroy(qt->branches[i]);
+            QuadTreeDestroy(&(qt->branches[i]));
             qt->branches[i] = NULL;
         }
 
@@ -54,7 +61,8 @@ void QuadTreeDestroy(quad_tree_t* qt) {
     }
 
     printf("Freeing 0x%X\n", qt);
-    free(qt);
+    free(*pQt);
+    *pQt = NULL;
 
     --depth;
 }
@@ -94,7 +102,7 @@ int main() {
         QuadTreeInsertOn(root->branches[1]->branches[2]->branches[0], 0, 8);
     }
 
-    QuadTreeDestroy(root);
+    QuadTreeDestroy(&root);
 
     return EXIT_SUCCESS;
 }
