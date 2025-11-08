@@ -38,9 +38,11 @@ int OcTreeInsertOn(octree_t* ot, int index, int value) {
     return 1;
 }
 
-void OcTreeDestroy(octree_t* ot) {
+void OcTreeDestroy(octree_t** pOt) {
     static int depth = 0;
     static int branchIndex = 0;
+
+    octree_t* ot = *pOt;
 
     printf("[[ DEPTH = %d on branch #%d ]]\n", depth, branchIndex);
     printf("DATA = %d\n", ot->data);
@@ -50,13 +52,14 @@ void OcTreeDestroy(octree_t* ot) {
             printf("Freeing 0x%p->branches[%d]\n\n", ot, i);
             ++depth;
             branchIndex = i;
-            OcTreeDestroy(ot->branches[i]);
+            OcTreeDestroy(&(ot->branches[i]));
             ot->branches[i] = NULL;
         }
     }
 
-    printf("Freeing 0x%p\n", ot);
-    free(ot);
+    printf("Freeing 0x%p\n", pOt);
+    free(*pOt);
+    *pOt = NULL;
 
     --depth;
 }
@@ -76,11 +79,14 @@ int main() {
         for (int i = 0; i < OCTREE_MAX_BRANCHES; ++i) {
             for (int j = 0; j < OCTREE_MAX_BRANCHES; ++j) {
                 OcTreeInsertOn(root->branches[i], j, 8 * i + j);
-            }   
+            }
         }
+
+        OcTreeDestroy(&root->branches[3]);
+        printf("AFTER FREE: %p\n", root->branches[3]);
     }
 
-    OcTreeDestroy(root);
+    OcTreeDestroy(&root);
 
     return EXIT_SUCCESS;
 }
