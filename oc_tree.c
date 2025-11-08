@@ -59,7 +59,7 @@ void OcTreeDestroy(octree_t** pOt) {
 
     printf("Freeing 0x%p\n", pOt);
     free(*pOt);
-    *pOt = NULL;
+    *pOt = NULL; // setting to NULL to avoid segfault when destroying part of a tree recursively
 
     --depth;
 }
