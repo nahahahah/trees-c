@@ -82,7 +82,7 @@ int main() {
             }
         }
 
-        OcTreeDestroy(&root->branches[3]);
+        OcTreeDestroy(&root->branches[3]); // not necessary to set root->branches[3] to NULL anymore. OcTreeDestroy handles that.
         printf("AFTER FREE: %p\n", root->branches[3]);
     }
 
